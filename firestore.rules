@@ -1,0 +1,32 @@
+// ════════════════════════════════════════════════
+//  Firestore Security Rules
+//  複製到 Firebase Console → Firestore → Rules
+// ════════════════════════════════════════════════
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 旅行記錄 — 任何人可讀，只有登入者（透過密碼）可寫
+    // 因為是純密碼方案（沒有 Firebase Auth），先開放讀寫
+    // 正式上線後建議加上 Firebase Auth
+    match /trips/{tripId} {
+      allow read: if true;
+      allow write: if true;   // TODO: 加上認證後改為 request.auth != null
+
+      match /spots/{spotId} {
+        allow read: if true;
+        allow write: if true;
+
+        match /photos/{photoId} {
+          allow read: if true;
+          allow write: if true;
+        }
+
+        match /comments/{commentId} {
+          allow read: if true;
+          allow write: if true;
+        }
+      }
+    }
+  }
+}

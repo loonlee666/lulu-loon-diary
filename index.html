@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lulu & Loon's Travel Diary 🌸</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ── PASSWORD GATE ─────────────────────────────────────────── -->
+<div id="gate" class="gate">
+  <div class="gate-card">
+    <div class="gate-deco">✦</div>
+    <h1 class="gate-title">Lulu <span>&</span> Loon</h1>
+    <p class="gate-sub">Travel Diary</p>
+    <div class="gate-divider"></div>
+    <p class="gate-hint">請輸入密碼進入 🔑</p>
+    <div class="gate-input-wrap">
+      <input id="pw-input" type="password" placeholder="password" autocomplete="off" />
+      <button id="pw-btn" onclick="checkPassword()">→</button>
+    </div>
+    <p id="pw-error" class="pw-error"></p>
+    <p class="gate-footer">Our little corner of the world 🌸</p>
+  </div>
+</div>
+
+<!-- ── MAIN APP ───────────────────────────────────────────────── -->
+<div id="app" class="app hidden">
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <span class="brand-deco">✦</span>
+        <div>
+          <h1 class="brand-title">Lulu <em>&</em> Loon</h1>
+          <p class="brand-sub">Travel Diary</p>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <button class="nav-link active" onclick="showPage('home')">Home</button>
+        <button class="nav-link" onclick="showPage('trips')">Trips</button>
+        <button id="admin-nav-btn" class="nav-link hidden" onclick="showPage('admin')">Admin ✦</button>
+        <div class="user-badge" id="user-badge">
+          <span id="user-name-display">Guest</span>
+          <button onclick="logout()" class="logout-btn">登出</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── HOME PAGE ── -->
+  <section id="page-home" class="page active">
+    <div class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">✦ Our Story in Places ✦</p>
+        <h2 class="hero-title">每一段旅程<br /><em>都是一封情書</em></h2>
+        <p class="hero-desc">記錄我們走過的每一個城市、每一口美食、每一個讓我們想起彼此的瞬間。</p>
+        <button class="btn-primary" onclick="showPage('trips')">瀏覽旅行 →</button>
+      </div>
+      <div class="hero-sticker s1">📸</div>
+      <div class="hero-sticker s2">✈️</div>
+      <div class="hero-sticker s3">💌</div>
+      <div class="hero-sticker s4">🗺️</div>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="stats-strip">
+      <div class="stat-item">
+        <span class="stat-num" id="stat-trips">2</span>
+        <span class="stat-label">趟旅行</span>
+      </div>
+      <div class="stat-divider">✦</div>
+      <div class="stat-item">
+        <span class="stat-num" id="stat-spots">0</span>
+        <span class="stat-label">個景點</span>
+      </div>
+      <div class="stat-divider">✦</div>
+      <div class="stat-item">
+        <span class="stat-num" id="stat-photos">0</span>
+        <span class="stat-label">張照片</span>
+      </div>
+      <div class="stat-divider">✦</div>
+      <div class="stat-item">
+        <span class="stat-num" id="stat-days">13</span>
+        <span class="stat-label">天的回憶</span>
+      </div>
+    </div>
+
+    <!-- Recent trips preview -->
+    <div class="section-wrap">
+      <div class="section-header">
+        <h3 class="section-title">Recent Trips</h3>
+        <span class="section-deco">— 最近的旅程 —</span>
+      </div>
+      <div class="trip-grid" id="home-trip-grid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TRIPS LIST PAGE ── -->
+  <section id="page-trips" class="page hidden">
+    <div class="page-hero trips-hero">
+      <h2>All Trips</h2>
+      <p>我們的旅行足跡 ✈️</p>
+    </div>
+    <div class="section-wrap">
+      <div class="trip-grid full" id="all-trip-grid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TRIP DETAIL PAGE ── -->
+  <section id="page-trip-detail" class="page hidden">
+    <div id="trip-detail-content"></div>
+  </section>
+
+  <!-- ── ADMIN PAGE ── -->
+  <section id="page-admin" class="page hidden">
+    <div class="page-hero admin-hero">
+      <h2>Admin Panel</h2>
+      <p>Loon 的後台管理 ✦</p>
+    </div>
+    <div class="section-wrap">
+      <div class="admin-grid">
+
+        <!-- New Trip Form -->
+        <div class="admin-card">
+          <h3 class="admin-card-title">✦ 新增旅行</h3>
+          <label>旅行名稱</label>
+          <input id="new-trip-name" type="text" placeholder="e.g. 首爾之旅" class="admin-input" />
+          <label>日期範圍</label>
+          <input id="new-trip-dates" type="text" placeholder="e.g. 7/15 – 7/20" class="admin-input" />
+          <label>封面 Emoji / 描述</label>
+          <input id="new-trip-emoji" type="text" placeholder="🇰🇷" class="admin-input" />
+          <label>簡介</label>
+          <textarea id="new-trip-desc" placeholder="這趟旅行的故事..." class="admin-textarea"></textarea>
+          <button class="btn-primary" onclick="addTrip()">新增旅行</button>
+        </div>
+
+        <!-- Manage Trips -->
+        <div class="admin-card">
+          <h3 class="admin-card-title">✦ 管理旅行</h3>
+          <div id="admin-trip-list" class="admin-list">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Add Spot Form (appears after selecting a trip) -->
+      <div id="admin-spot-section" class="admin-card mt-2 hidden">
+        <h3 class="admin-card-title">✦ 新增景點 / 餐廳</h3>
+        <p class="admin-sub">目前行程：<strong id="admin-selected-trip"></strong></p>
+        <div class="admin-grid-2">
+          <div>
+            <label>景點名稱</label>
+            <input id="new-spot-name" type="text" placeholder="景點或餐廳名稱" class="admin-input" />
+            <label>類型</label>
+            <select id="new-spot-type" class="admin-input">
+              <option value="spot">📍 景點</option>
+              <option value="food">🍜 餐廳 / 美食</option>
+              <option value="alt-spot">🔖 備選景點</option>
+              <option value="alt-food">🔖 備選餐廳</option>
+            </select>
+            <label>日期 (D幾)</label>
+            <input id="new-spot-day" type="text" placeholder="e.g. D1" class="admin-input" />
+          </div>
+          <div>
+            <label>地址 / 位置</label>
+            <input id="new-spot-addr" type="text" placeholder="地址或描述" class="admin-input" />
+            <label>備註</label>
+            <textarea id="new-spot-note" placeholder="預算、注意事項..." class="admin-textarea short"></textarea>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="addSpot()">新增景點</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <p>Made with 💕 by Loon · <em>For Lulu, always.</em></p>
+  </footer>
+
+</div>
+
+<!-- ── MODAL ─────────────────────────────────────────────────── -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- ── TOAST ──────────────────────────────────────────────────── -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, getDoc }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+  // ── FIREBASE CONFIG ── 換成你自己的設定 ──────────────────────
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  // ─────────────────────────────────────────────────────────────
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // 掛到 window 讓其他函數存取
+  window._db = db;
+  window._storage = storage;
+  window._firebase = { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, getDoc };
+
+  // 初始化完成後載入資料
+  window.firebaseReady = true;
+  if (window._onFirebaseReady) window._onFirebaseReady();
+</script>
+
+<script src="js/seoul-data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
